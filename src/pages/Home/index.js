@@ -1,103 +1,74 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, FlatList } from 'react-native';
+import { SafeAreaView, StyleSheet, FlatList, View, Text } from 'react-native';
+import * as Location from 'expo-location';
+
 import Conditions from '../../components/Conditions';
 import Forecast from '../../components/Forecast';
 import Header from '../../components/Header';
 import Menu from '../../components/Menu';
-const myList = [
-  {
-    "date": "03-15",
-    "weekday": "Mon",
-    "max": 27,
-    "min": 17,
-    "description": "Thunderstorms",
-    "condition": "clear_day"
-  },
-  {
-    "date": "03-16",
-    "weekday": "Tue",
-    "max": 26,
-    "min": 18,
-    "description": "Thunderstorms",
-    "condition": "storm"
-  },
-  {
-    "date": "03-17",
-    "weekday": "Wed",
-    "max": 27,
-    "min": 17,
-    "description": "Thunderstorms",
-    "condition": "storm"
-  },
-  {
-    "date": "03-18",
-    "weekday": "Thu",
-    "max": 27,
-    "min": 18,
-    "description": "Thunderstorms",
-    "condition": "storm"
-  },
-  {
-    "date": "03-19",
-    "weekday": "Fri",
-    "max": 26,
-    "min": 18,
-    "description": "Day partly cloudy",
-    "condition": "cloudly_day"
-  },
-  {
-    "date": "03-20",
-    "weekday": "Sat",
-    "max": 26,
-    "min": 17,
-    "description": "Day partly cloudy",
-    "condition": "cloudly_day"
-  },
-  {
-    "date": "03-21",
-    "weekday": "Sun",
-    "max": 27,
-    "min": 17,
-    "description": "Day partly cloudy",
-    "condition": "cloudly_day"
-  },
-  {
-    "date": "03-22",
-    "weekday": "Mon",
-    "max": 27,
-    "min": 18,
-    "description": "Day mostly cloudy",
-    "condition": "cloud"
-  },
-  {
-    "date": "03-23",
-    "weekday": "Tue",
-    "max": 28,
-    "min": 18,
-    "description": "Day mostly cloudy",
-    "condition": "cloud"
-  },
-  {
-    "date": "03-24",
-    "weekday": "Wed",
-    "max": 26,
-    "min": 20,
-    "description": "Thunderstorms",
-    "condition": "storm"
-  }
-];
+
+import api, { key } from '../../services/api';
 
 export default function Home() {
+  const [errorMsg, setErrorMsg] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [weather, setWeather] = React.useState([]);
+  const [icon, setIcon] = React.useState({ name: 'cloud', color: '#fff' });
+  const [background, setBackground] = React.useState(['#1ed6ff', '#97c1ff']);
+
+
+  React.useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permissão negada para acessar a localização.');
+        setLoading(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+
+      const response = await api.get(`weather?key=${key}&lat=${location.coords.latitude}&lon=${location.coords.longitude}`);
+      setWeather(response.data);
+
+      if (response.data.results.currently === 'noite') {
+        setBackground(['#0c3741', '#0f2f61']);
+      }
+
+      switch (response.data.results.condition_slug) {
+        case 'clear_day':
+          setIcon({ name: 'partly-sunny', color: '#ffb300' })
+          break;
+        case 'rain':
+          setIcon({ name: 'rainy', color: '#FFF' })
+          break;
+        case 'storm':
+          setIcon({ name: 'rainy', color: '#FFF' })
+          break;
+      }
+      setLoading(false);
+
+    })();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ fontSize: 17, fontStyle: 'italic' }}>Carregando dados...</Text>
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <Menu />
-      <Header />
-      <Conditions />
+      <Header background={background} weather={weather} icon={icon} />
+      <Conditions weather={weather} />
       <FlatList
+        showsHorizontalScrollIndicator={false}
         horizontal={true}
         contentContainerStyle={{ paddingBottom: '5%' }}
         style={styles.list}
-        data={myList}
+        data={weather.results.forecast}
         keyExtractor={item => item.date}
         renderItem={({ item }) => <Forecast data={item} />}
       />

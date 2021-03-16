@@ -4,21 +4,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { Ionicons } from '@expo/vector-icons';
 
-export default function Header() {
+export default function Header({ background, weather, icon }) {
   return (
     <LinearGradient
       style={styles.header}
-      colors={['#1ed6ff', '#97c1ff']}
+      colors={background}
     >
-      <Text style={styles.date}>20/07/1991</Text>
-      <Text style={styles.city}>Brasília</Text>
+      <Text style={styles.date}>{weather.results.date}</Text>
+      <Text style={styles.city}>{weather.results.city_name}</Text>
 
       <Ionicons
-        name="cloud"
-        color="#fff"
+        name={icon.name}
+        color={icon.color}
         size={150}
       />
-      <Text style={styles.temp}>30º</Text>
+      <Text style={styles.temp}>{weather.results.temp}º</Text>
     </LinearGradient>
   );
 }
@@ -26,7 +26,7 @@ export default function Header() {
 const styles = StyleSheet.create({
   header: {
     width: '95%',
-    height: '55%',
+    height: '65%',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8
