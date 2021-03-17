@@ -24,7 +24,9 @@ npm install
 Generate your key on [HG Brasil](https://hgbrasil.com/status/weather "HG Brasil") and edit: 
 
 📦src
+
  ┣ 📂services
+ 
  ┣ ┗ 📜api.js
 
 ````
