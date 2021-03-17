@@ -8,7 +8,7 @@
 - [React Native](https://reactnative.dev "React Native")
 - [JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript "JavaScript")
 
-### How to execute
+### Get start
 
 Clone the project
 
