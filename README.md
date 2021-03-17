@@ -13,7 +13,7 @@
 Clone the project
 
 ````
-git clone https://github.com/thiagotnon/Password-Generator.git
+git clone https://github.com/thiagotnon/weather_app.git
 ````
 
 Install the dependences
